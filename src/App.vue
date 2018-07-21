@@ -1,14 +1,21 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <p>hellow</p>
+    <m-header></m-header>
+    <tab></tab>
     <router-view/>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'App'
+  import MHeader from 'components/m-header/m-header'
+  import Tab from 'components/tab/tab'
+
+  export default {
+    name: 'App',
+    components:{
+      MHeader,
+      Tab
+    }
 }
 </script>
 
