@@ -38,7 +38,7 @@
       }
     },
     mounted() {
-      // 数据获取为异步，则此处异步，数据获取后才能渲染
+      // 移动端响应时间17毫秒
       setTimeout(() => {
         this._setSliderWidth()
         this._initDots()
@@ -65,6 +65,7 @@
     deactivated() {
       clearTimeout(this.timer)
     },
+    // 释放内存资源
     beforeDestroy() {
       clearTimeout(this.timer)
     },

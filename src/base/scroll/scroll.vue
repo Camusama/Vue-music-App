@@ -54,9 +54,10 @@
           probeType: this.probeType,
           click: this.click
         })
-
+        // 如果需要监听滚动位置
         if (this.listenScroll) {
           let me = this
+          // pos对象有x，y属性，此处需要实例提供emit所以缓存this
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos)
           })
@@ -93,6 +94,7 @@
       }
     },
     watch: {
+      // 父级prop下来的data变化，则刷新
       data() {
         setTimeout(() => {
           this.refresh()

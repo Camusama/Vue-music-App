@@ -1,6 +1,6 @@
 <template>
   <div class="recommend" ref="recommend">
-    <!--绑定disList数据使其刷新-->
+    <!--绑定disList数据使其刷新，因disList最后获取-->
     <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
         <!--轮播图。请求为异步操作，因此需验证有返回值时才渲染-->
@@ -8,6 +8,7 @@
           <slider>
             <div v-for="item in recommends">
               <a :href="item.linkUrl">
+                <!--needsclick为fastclick插件关键字，有则不会阻止点击-->
                 <img class="needsclick" @load="loadImage" :src="item.picUrl">
               </a>
             </div>
@@ -30,6 +31,9 @@
           </ul>
         </div>
       </div>
+      <div class="loading-container" v-show="!discList.length">
+        <loading></loading>
+      </div>
     </scroll>
     <router-view></router-view>
   </div>
@@ -40,6 +44,8 @@
   import Scroll from 'base/scroll/scroll'
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
+  import Loading from 'base/loading/loading'
+
 
   export default {
     data() {
@@ -78,10 +84,17 @@
           this.$refs.scroll.refresh()
         }
       },
+      selectItem(item) {
+        this.$router.push({
+          path: `/recommend/${item.dissid}`
+        })
+        this.setDisc(item)
+      }
     },
     components: {
       Slider,
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
