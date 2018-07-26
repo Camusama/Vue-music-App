@@ -44,7 +44,7 @@ export function createSong(musicData) {
     url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=46`
   })
 }
-
+// 多个歌手则拼接
 function filterSinger(singer) {
   let ret = []
   if (!singer) {
@@ -54,5 +54,6 @@ function filterSinger(singer) {
     ret.push(s.name)
   })
   return ret.join('/')
+  // 数组join方法返回字符串，传参为分隔符
 }
 

@@ -10,7 +10,7 @@
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
   import ListView from 'base/listview/listview'
-
+  import {mapMutations} from 'vuex'
   const HOT_SINGER_LEN = 10
   const HOT_NAME = '热门'
 
@@ -29,11 +29,15 @@
 
     },
     methods: {
+      ...mapMutations({
+        setSinger:'SET_SINGER'
+      }),
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.singer.style.bottom = bottom
         this.$refs.list.refresh()
       },
+      // 歌手详情页跳转
       selectSinger(singer) {
         this.$router.push({
           path: `/singer/${singer.id}`

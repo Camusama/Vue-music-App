@@ -27,6 +27,7 @@
         </li>
       </ul>
     </div>
+    <!--固定title的实现，下面不是滚动的部分，直接获取当前滚动title值-->
     <div class="list-fixed" ref="fixed" v-show="fixedTitle">
       <div class="fixed-title">{{fixedTitle}} </div>
     </div>
@@ -70,14 +71,18 @@
       return {
         scrollY: -1,
         currentIndex: 0,
+        // 实现title过渡
         diff: -1
       }
     },
     created() {
+      // 3表示swiper时也派发事件，bs配置项
       this.probeType = 3
       this.listenScroll = true
       // 下面两个值用于在函数间传递数据，所以不用data(){}
+      // touch用于传递点击变化的y值
       this.touch = {}
+      // listHeight用于获取一个高度区间数组，[0,17,52...]
       this.listHeight = []
     },
     methods: {
@@ -113,7 +118,7 @@
       scroll(pos) {
         this.scrollY = pos.y
       },
-      // 计算整个scroll部分的每层高度作数组
+      // 计算整个scroll部分的每层group离最上顶部绝对值作数组
       _calculateHeight() {
         this.listHeight = []
         const list = this.$refs.listGroup
@@ -146,9 +151,10 @@
           this._calculateHeight()
         }, 20)
       },
+      // 旨在使左边滚动影响右边高亮
       scrollY(newY) {
         const listHeight = this.listHeight
-        // 当滚动到顶部，newY>0
+        // 当滚动到顶部以上，newY>0
         if (newY > 0) {
           this.currentIndex = 0
           return
@@ -159,6 +165,7 @@
           let height2 = listHeight[i + 1]
           if (-newY >= height1 && -newY < height2) {
             this.currentIndex = i
+            // diff指group的顶部，也是title的底部距离上一标签的高度
             this.diff = height2 + newY
             return
           }
@@ -166,7 +173,9 @@
         // 当滚动到底部，且-newY大于最后一个元素的上限
         this.currentIndex = listHeight.length - 2
       },
+      // 对于左侧滑动影响右侧高亮，需要获得此时的index值，方法是获取滚动的距离，再对左侧group区间高度作一个数组，将距离在此数组区间内判断
       diff(newVal) {
+        // 实现title过渡效果
         let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
         if (this.fixedTop === fixedTop) {
           return
