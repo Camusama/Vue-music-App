@@ -1,23 +1,28 @@
 <template>
   <transition name="slide">
-    <!--<music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>-->
+    <music-list :title="title" :bg-image="bgImage" :songs="songs"></music-list>
     <div class="div1"></div>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
+  import MusicList from 'components/music-list/music-list'
   import {getSingerDetail} from 'api/singer'
   import {ERR_OK} from 'api/config'
   import {createSong} from 'common/js/song'
   import {mapGetters} from 'vuex'
 
   export default {
+    components:{
+      MusicList
+    },
     computed: {
       ...mapGetters([
         'singer'
       ]),
+      // 传入music-list
       title() {
-        // return this.singer.name
+        return this.singer.name
       },
       bgImage() {
         return this.singer.avatar
@@ -52,9 +57,10 @@
           let {musicData} = item
           // 解构赋值等同于let musicData = item.musicData
           if (musicData.songid && musicData.albummid) {
+            // createSong方法返回一个song类，包含一些默认值
             ret.push(createSong(musicData))
           }
-          console.log(ret)
+          // console.log(ret)
         })
         return ret
       }
