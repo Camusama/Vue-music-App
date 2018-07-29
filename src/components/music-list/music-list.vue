@@ -33,7 +33,7 @@
   import SongList from 'base/song-list/song-list'
   import {prefixStyle} from 'common/js/dom'
   import {playlistMixin} from 'common/js/mixin'
-  import {mapActions} from 'vuex'
+  import {mapActions,mapGetters} from 'vuex'
 
   // title高
   const RESERVED_HEIGHT = 40
@@ -69,7 +69,14 @@
     computed: {
       bgStyle() {
         return `background-image:url(${this.bgImage})`
-      }
+      },
+      ...mapGetters([
+        'currentIndex',
+        'fullScreen',
+        'playing',
+        'currentSong',
+        'playlist'
+      ]),
     },
     created() {
       // scroll插件配置
@@ -97,11 +104,14 @@
       back() {
         this.$router.back()
       },
+      // 播放
       selectItem(item, index) {
         this.selectPlay({
           list: this.songs,
           index
         })
+        // 测试
+        console.log(this.currentSong)
       },
       random() {
         this.randomPlay({

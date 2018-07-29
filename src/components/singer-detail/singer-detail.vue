@@ -11,6 +11,7 @@
   import {ERR_OK} from 'api/config'
   import {createSong} from 'common/js/song'
   import {mapGetters} from 'vuex'
+  import {getMusic} from "../../api/getMusic";
 
   export default {
     components:{
@@ -57,8 +58,18 @@
           let {musicData} = item
           // 解构赋值等同于let musicData = item.musicData
           if (musicData.songid && musicData.albummid) {
+            // 找到songvkey，传入才可获取音乐地址
+            getMusic(musicData.songmid).then((res)=>{
+              if(res.code === ERR_OK){
+                const svkey=res.data.items
+                const songVkey= svkey[0].vkey
+                const newSong =createSong(musicData,songVkey)
+                // console.log(newSong)
+                ret.push(newSong)
+              }
+            })
             // createSong方法返回一个song类，包含一些默认值
-            ret.push(createSong(musicData))
+            // ret.push(createSong(musicData))
           }
           // console.log(ret)
         })
