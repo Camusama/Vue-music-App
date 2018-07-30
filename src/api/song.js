@@ -10,6 +10,7 @@ export function getLyric(mid) {
     hostUin: 0,
     needNewCode: 0,
     categoryId: 10000000,
+    g_tk:5381,
     pcachetime: +new Date(),
     format: 'json'
   })

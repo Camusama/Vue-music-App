@@ -11,10 +11,13 @@
   import Singer from 'common/js/singer'
   import ListView from 'base/listview/listview'
   import {mapMutations} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
+
   const HOT_SINGER_LEN = 10
   const HOT_NAME = '热门'
 
   export default {
+    mixins: [playlistMixin],
     components:{
       ListView
     },
@@ -32,6 +35,7 @@
       ...mapMutations({
         setSinger:'SET_SINGER'
       }),
+      // 处理悬浮播放器刷新scroll高度
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.singer.style.bottom = bottom

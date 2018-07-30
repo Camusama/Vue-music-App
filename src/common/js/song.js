@@ -15,12 +15,14 @@ export default class Song {
   }
 
   getLyric() {
+    // 如果已经有歌词，则不请求
     if (this.lyric) {
       return Promise.resolve(this.lyric)
     }
 
     return new Promise((resolve, reject) => {
       getLyric(this.mid).then((res) => {
+        // base64的json解码
         if (res.retcode === ERR_OK) {
           this.lyric = Base64.decode(res.lyric)
           resolve(this.lyric)

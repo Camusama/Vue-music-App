@@ -132,9 +132,13 @@
         currentTime: 0,
         // 小窗口播放按钮半径
         radius: 32,
+        // 歌词
         currentLyric: null,
+        // 当前歌词高亮行
         currentLineNum: 0,
+        // 当前显示大图标还是歌词
         currentShow: 'cd',
+        // 当前播放歌词，当大图标显示时
         playingLyric: ''
       }
     },
@@ -256,13 +260,39 @@
       },
       // 切换播放暂停
       togglePlaying (){
+        if (!this.songReady) {
+          return
+        }
+        // 歌词处理
         this.setPlayingState(!this.playing)
+        if (this.currentLyric) {
+          this.currentLyric.togglePlay()
+        }
+      },
+      // audio事件，播放结束时，如果单曲循环
+      end() {
+        if (this.mode === playMode.loop) {
+          this.loop()
+        } else {
+          this.next()
+        }
+      },
+      // 单曲循环
+      loop() {
+        this.$refs.audio.currentTime = 0
+        this.$refs.audio.play()
+        this.setPlayingState(true)
+        // 当单曲循环重启时，歌词回到初始
+        if (this.currentLyric) {
+          this.currentLyric.seek(0)
+        }
       },
       // 下一首
       next() {
         if (!this.songReady) {
           return
         }
+        // 如果只有一首歌，修改了index却改不了currentsong，会导致后面都不执行
         if (this.playlist.length === 1) {
           this.loop()
           return
@@ -335,6 +365,7 @@
         if (!this.playing) {
           this.togglePlaying()
         }
+        // 拖动进度条切换歌词
         if (this.currentLyric) {
           this.currentLyric.seek(currentTime * 1000)
         }
@@ -360,6 +391,121 @@
         })
         this.setCurrentIndex(index)
       },
+      // 请求歌词
+      getLyric() {
+        this.currentSong.getLyric().then((lyric) => {
+          if (this.currentSong.lyric !== lyric) {
+            return
+          }
+          this.currentLyric = new Lyric(lyric, this.handleLyric)
+          if (this.playing) {
+            this.currentLyric.play()
+          }
+          // 当请求不到歌词时
+        }).catch(() => {
+          this.currentLyric = null
+          this.playingLyric = ''
+          this.currentLineNum = 0
+        })
+      },
+      // 歌词每行改变时回调
+      handleLyric({lineNum, txt}) {
+        this.currentLineNum = lineNum
+        // 操作歌词所在scroll，滚动处为高亮行减5
+        if (lineNum > 5) {
+          let lineEl = this.$refs.lyricLine[lineNum - 5]
+          this.$refs.lyricList.scrollToElement(lineEl, 1000)
+        } else {
+          // 否则直接滚动到顶部
+          this.$refs.lyricList.scrollTo(0, 0, 1000)
+        }
+        // 当前播放歌词显示
+        this.playingLyric = txt
+      },
+      // 处理大图标页面的点击事件，向左滑动显示歌词页
+      middleTouchStart(e) {
+        this.touch.initiated = true
+        // 用来判断是否是一次移动
+        this.touch.moved = false
+        const touch = e.touches[0]
+        this.touch.startX = touch.pageX
+        this.touch.startY = touch.pageY
+      },
+      middleTouchMove(e) {
+        if (!this.touch.initiated) {
+          return
+        }
+        const touch = e.touches[0]
+        // 纵轴偏移如果大于横轴偏移，则不显示歌词界面
+        const deltaX = touch.pageX - this.touch.startX
+        const deltaY = touch.pageY - this.touch.startY
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          return
+        }
+        if (!this.touch.moved) {
+          this.touch.moved = true
+        }
+        // 歌词样式dom
+        const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
+        const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX))
+        this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+        // 歌词渐显
+        this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyricList.$el.style[transitionDuration] = 0
+        // 大图标渐隐
+        this.$refs.middleL.style.opacity = 1 - this.touch.percent
+        this.$refs.middleL.style[transitionDuration] = 0
+      },
+      // touchend时大图标向左消失
+      middleTouchEnd() {
+        if (!this.touch.moved) {
+          return
+        }
+        let offsetWidth
+        let opacity
+        if (this.currentShow === 'cd') {
+          // 从右向左滑动超过10%
+          if (this.touch.percent > 0.1) {
+            // 歌词左偏移入屏幕
+            offsetWidth = -window.innerWidth
+            opacity = 0
+            // 显示歌词
+            this.currentShow = 'lyric'
+          } else {
+            offsetWidth = 0
+            opacity = 1
+          }
+        } else {
+          // 从左向右滑动超过10%
+          if (this.touch.percent < 0.9) {
+            offsetWidth = 0
+            // 显示大图标
+            this.currentShow = 'cd'
+            opacity = 1
+          } else {
+            // 否则上文
+            offsetWidth = -window.innerWidth
+            opacity = 0
+          }
+        }
+        // 歌词切换的动态样式效果设置
+        const time = 300
+        // 歌词渐显
+        this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
+        // 大图标渐隐
+        this.$refs.middleL.style.opacity = opacity
+        this.$refs.middleL.style[transitionDuration] = `${time}ms`
+        this.touch.initiated = false
+      },
+      // 显示播放列表
+      showPlaylist() {
+        this.$refs.playlist.show()
+      },
+    },
+    created() {
+      // 在点击事件中传递数据
+      this.touch = {}
     },
     watch:{
       // 播放，需要先获取到
@@ -370,6 +516,19 @@
         this.$nextTick(() => {
           this.$refs.audio.play()
         })
+        // 重置歌曲切换时歌词定时器
+        if (this.currentLyric) {
+          this.currentLyric.stop()
+          this.currentTime = 0
+          this.playingLyric = ''
+          this.currentLineNum = 0
+        }
+        // 手机浏览器响应时保证切换应用时能继续播放
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.$refs.audio.play()
+          this.getLyric()
+        }, 1000)
       },
       // 播放状态
       playing(newPlaying) {

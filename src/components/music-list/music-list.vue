@@ -93,6 +93,7 @@
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
     },
     methods: {
+      // 当组件下方有浮动播放器时，操作整体scroll高度防止遮挡
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.list.$el.style.bottom = bottom

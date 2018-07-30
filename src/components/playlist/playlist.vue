@@ -49,6 +49,18 @@
   import {playerMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playerMixin],
+    components: {
+      Scroll,
+      // Confirm,
+      // AddSong
+    },
+    data() {
+      return {
+        showFlag: false,
+        refreshDelay: 120
+      }
+    },
 
   }
 </script>

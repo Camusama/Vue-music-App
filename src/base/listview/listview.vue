@@ -112,6 +112,7 @@
 
         this._scrollTo(anchorIndex)
       },
+      // 对singer暴露一个重载，刷新scroll高度
       refresh() {
         this.$refs.listview.refresh()
       },

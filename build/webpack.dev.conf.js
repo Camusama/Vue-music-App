@@ -78,6 +78,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           params: req.query
         }).then((response) => {
           var ret = response.data
+          // 歌词返回为string。转为json
           if (typeof ret === 'string') {
             var reg = /^\w+\(({[^()]+})\)$/
             var matches = ret.match(reg)
