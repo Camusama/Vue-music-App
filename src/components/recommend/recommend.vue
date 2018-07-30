@@ -46,10 +46,12 @@
   import {ERR_OK} from 'api/config'
   import Loading from 'base/loading/loading'
   import {playlistMixin} from 'common/js/mixin'
+  import {mapMutations} from 'vuex'
 
 
   export default {
     mixins: [playlistMixin],
+
     data() {
       return {
         recommends: [],
@@ -62,6 +64,10 @@
       this._getDiscList()
     },
     methods: {
+      // 选择歌单
+      ...mapMutations({
+        setDisc: 'SET_DISC'
+      }),
       // 当组件下方有浮动播放器时，操作整体scroll高度防止遮挡
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
@@ -93,6 +99,7 @@
           this.$refs.scroll.refresh()
         }
       },
+      // 跳转歌单详情
       selectItem(item) {
         this.$router.push({
           path: `/recommend/${item.dissid}`

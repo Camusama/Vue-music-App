@@ -12,6 +12,8 @@ const state={
   mode: playMode.sequence,
   // 当前播放在playlist里的索引值
   currentIndex: -1,
+  // 歌单
+  disc: {},
 
 }
 

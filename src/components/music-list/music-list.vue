@@ -111,8 +111,6 @@
           list: this.songs,
           index
         })
-        // 测试
-        console.log(this.currentSong)
       },
       random() {
         this.randomPlay({
