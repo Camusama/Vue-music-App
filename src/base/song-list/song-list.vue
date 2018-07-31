@@ -21,6 +21,7 @@
         type: Array,
         default: []
       },
+      // 显示排行时前图标
       rank: {
         type: Boolean,
         default: false
@@ -34,6 +35,7 @@
       getDesc(song) {
         return `${song.singer}·${song.album}`
       },
+      // 传入索引，前三有图标，后面为数字
       getRankCls(index) {
         if (index <= 2) {
           return `icon icon${index}`
@@ -41,6 +43,7 @@
           return 'text'
         }
       },
+      // 后面排行为index+1
       getRankText(index) {
         if (index > 2) {
           return index + 1
