@@ -44,24 +44,101 @@
   import {mapActions} from 'vuex'
   import {playMode} from 'common/js/config'
   import Scroll from 'base/scroll/scroll'
-  // import Confirm from 'base/confirm/confirm'
-  // import AddSong from 'components/add-song/add-song'
+  import Confirm from 'base/confirm/confirm'
+  import AddSong from 'components/add-song/add-song'
   import {playerMixin} from 'common/js/mixin'
 
   export default {
     mixins: [playerMixin],
-    components: {
-      Scroll,
-      // Confirm,
-      // AddSong
-    },
     data() {
       return {
         showFlag: false,
         refreshDelay: 120
       }
     },
-
+    computed: {
+      // 播放模式按钮文本
+      modeText() {
+        return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
+      }
+    },
+    methods: {
+      show() {
+        // 显示，则刷新并滚动到当前播放
+        this.showFlag = true
+        setTimeout(() => {
+          this.$refs.listContent.refresh()
+          this.scrollToCurrent(this.currentSong)
+        }, 20)
+      },
+      hide() {
+        this.showFlag = false
+      },
+      // 确认框
+      showConfirm() {
+        this.$refs.confirm.show()
+      },
+      // 清空框
+      confirmClear() {
+        this.deleteSongList()
+        this.hide()
+      },
+      // 控制播放歌曲前图标c样式
+      getCurrentIcon(item) {
+        if (this.currentSong.id === item.id) {
+          return 'icon-play'
+        }
+        return ''
+      },
+      // 切换当前歌曲
+      selectItem(item, index) {
+        if (this.mode === playMode.random) {
+          index = this.playlist.findIndex((song) => {
+            return song.id === item.id
+          })
+        }
+        this.setCurrentIndex(index)
+        this.setPlayingState(true)
+      },
+      // 找到当前播放dom
+      scrollToCurrent(current) {
+        const index = this.sequenceList.findIndex((song) => {
+          return current.id === song.id
+        })
+        this.$refs.listContent.scrollToElement(this.$refs.list.$el.children[index], 300)
+      },
+      // 删除一个项目
+      deleteOne(item) {
+        this.deleteSong(item)
+        if (!this.playlist.length) {
+          this.hide()
+        }
+      },
+      // 显示添加框
+      addSong() {
+        this.$refs.addSong.show()
+      },
+      ...mapActions([
+        'deleteSong',
+        'deleteSongList'
+      ])
+    },
+    watch: {
+      // 随时滑动到当前播放
+      currentSong(newSong, oldSong) {
+        if (!this.showFlag || newSong.id === oldSong.id) {
+          return
+        }
+        setTimeout(() => {
+          this.scrollToCurrent(newSong)
+        }, 20)
+      }
+    },
+    components: {
+      Scroll,
+      Confirm,
+      AddSong
+    }
   }
 </script>
 

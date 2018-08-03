@@ -83,7 +83,7 @@
         }
         search(this.query, this.page, this.showSinger, perpage).then((res) => {
           if (res.code === ERR_OK) {
-            console.log("1",res.data)
+            // console.log("1",res.data)
             this.result = this._genResult(res.data)
             // console.log("34",this.result)
             this._checkMore(res.data)
@@ -102,9 +102,9 @@
             // 拼接结果
             let temp = this.result
             this.result = this._genResult(res.data)
-            console.log("temp",temp)
+            // console.log("temp",temp)
             this.result.splice(0,0,...temp)
-            console.log("more",this.result)
+            // console.log("more",this.result)
             this._checkMore(res.data)
           }
           // 此处同下_genResult,由于对歌曲链接的修正需要调用_normalizeSongs里getMusic的异步，
@@ -183,7 +183,7 @@
                 let newSong =createSong(musicData,songVkey)
                 // console.log(newSong)
                 ret.push(newSong)
-                console.log("6",ret)
+                // console.log("6",ret)
               }
             })
           }
